@@ -18,4 +18,4 @@ dependencies:
   - networkx
   - statsmodels
   # - ruptures
-prefix: /home/ubuntu/anaconda3/envs/modelselect
+# prefix: /home/ubuntu/anaconda3/envs/modelselect
