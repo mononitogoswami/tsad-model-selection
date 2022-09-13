@@ -1,5 +1,3 @@
-Copyright Amazon.com Inc. or its affiliates.
-
 # Unsupervised Model Selection for Time-series Anomaly Detection
 
 Hundreds of models for anomaly detection in time-series are available to practitioners, but no method exists to select the best model and its hyperparameters for a given dataset when labels are not available. We construct three classes of surrogate metrics which we show to be correlated with common supervised anomaly detection accuracy metrics such as the F1 score. 
@@ -186,5 +184,3 @@ If you use our code please cite our paper:
     }
 
 ```
-
-Copyright Amazon.com Inc. or its affiliates.
