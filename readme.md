@@ -14,16 +14,18 @@ The three classes of metrics are prediction accuracy, centrality, and performanc
 5. [Citation](#citation)
 ----
 
-<!-- <a id="methodology"></a> -->
+<a id="methodology"></a>
 ## Overview of Methodology 
 
-![Methodology Overview](assets/methods.png)
+<p align="center">
+<img height ="300px" src="assets/methods.png">
+</p>
 
 Figure 1: *The Model Selection Workflow.* We identify three classes of surrogate metrics of model quality, and propose a novel robust rank aggregation framework to combine multiple rankings from metrics. 
 
 ----
 
-<!-- <a id="datasets"></a> -->
+<a id="datasets"></a>
 ## Datasets
 
 We carry out experiments on two popular and widely used real-world collections with diverse time-series and anomalies: (1) UCR Anomaly Archive (UCR) (Wu & Keogh, 2021), and (2) Server Machine Dataset (SMD) (Su et al., 2019). 
@@ -66,7 +68,7 @@ To install `PyMAD`, please refer the [installation instructions](#installation).
 
 ----
 
-<!-- <a id="installation"></a> -->
+<a id="installation"></a>
 ## Installation
 
 We recommend installing [Ananconda](https://conda.io/projects/conda/en/latest/index.html) to run our code. To install Anaconda, review the installation instructions [here](https://docs.anaconda.com/anaconda/install/). 
@@ -97,7 +99,7 @@ Our support library [`PyMAD`](https://github.com/cchallu/PyMAD) is available on 
 
 ----
 
-<!-- <a id="code"></a> -->
+<a id="code"></a>
 ## Code Organization
 
 ```bash
@@ -168,7 +170,7 @@ Our support library [`PyMAD`](https://github.com/cchallu/PyMAD) is available on 
 ```
 
 ----
-<!-- <a id="citation"></a> -->
+<a id="citation"></a>
 ## Citation
 
 If you use our code please cite our paper: 
