@@ -4,7 +4,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-
 from typing import List, Tuple, Optional, Union, Dict
 import numpy as np
 from scipy.stats import spearmanr, kendalltau
@@ -16,25 +15,28 @@ import os
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append('/home/ubuntu/TSADModelSelection/') # TODO: Make this relative path maybe
+
+sys.path.append(
+    '/home/ubuntu/TSADModelSelection/')  # TODO: Make this relative path maybe
 # from scipy.stats import spearmanr, kendalltau
+
 
 class RunningStdWelford():
     """Welford algorithm for running mean and 
     standard deviation.
     """
-    def __init__(self, array:np.ndarray=None):
+    def __init__(self, array: np.ndarray = None):
         self.n = 0
         self.mean = 0
         self.std = 0
 
-    def update(self,x):
+    def update(self, x):
         self.n += 1
         new_mean = self.mean + (x - self.mean) / self.n
         new_std = self.std + (x - self.mean) * (x - new_mean)
         self.mean = new_mean
         self.std = new_std
-    
+
     def mean(self):
         return self.mean
 
@@ -43,34 +45,54 @@ class RunningStdWelford():
             return tol
         return np.sqrt(self.std / (self.n - 1))
 
-def visualize_predictions(predictions:dict, savefig=True):
+
+def visualize_predictions(predictions: dict, savefig=True):
     """Visualizes univariate models given the predictions dictionary
     """
     MODEL_NAMES = list(predictions.keys())
-    fig, axes = plt.subplots(len(MODEL_NAMES), 1, sharey=True, sharex=True, figsize=(30, 5*len(MODEL_NAMES)))
+    fig, axes = plt.subplots(len(MODEL_NAMES),
+                             1,
+                             sharey=True,
+                             sharex=True,
+                             figsize=(30, 5 * len(MODEL_NAMES)))
 
     for i, model_name in enumerate(MODEL_NAMES):
-        start_anomaly = np.argmax(np.diff(predictions[model_name]['anomaly_labels'].flatten()))
-        end_anomaly = np.argmin(np.diff(predictions[model_name]['anomaly_labels'].flatten()))
-        axes[i].plot(predictions[model_name]['Y'].flatten(), color='darkblue', label='Y')
-        axes[i].plot(predictions[model_name]['Y_hat'].flatten(), color='darkgreen', label='Y_hat')
-        axes[i].plot(np.arange(start_anomaly, end_anomaly), predictions[model_name]['Y'].flatten()[start_anomaly:end_anomaly], color='red', label='Anomaly')
-        
+        start_anomaly = np.argmax(
+            np.diff(predictions[model_name]['anomaly_labels'].flatten()))
+        end_anomaly = np.argmin(
+            np.diff(predictions[model_name]['anomaly_labels'].flatten()))
+        axes[i].plot(predictions[model_name]['Y'].flatten(),
+                     color='darkblue',
+                     label='Y')
+        axes[i].plot(predictions[model_name]['Y_hat'].flatten(),
+                     color='darkgreen',
+                     label='Y_hat')
+        axes[i].plot(
+            np.arange(start_anomaly, end_anomaly),
+            predictions[model_name]['Y'].flatten()[start_anomaly:end_anomaly],
+            color='red',
+            label='Anomaly')
+
         entity_scores = predictions[model_name]['entity_scores'].flatten()
-        entity_scores = (entity_scores - entity_scores.min())/(entity_scores.max() - entity_scores.min())
+        entity_scores = (entity_scores - entity_scores.min()) / (
+            entity_scores.max() - entity_scores.min())
         # entity_scores = (entity_scores - entity_scores.mean())/(entity_scores.std())
-        axes[i].plot(entity_scores, color='magenta', linestyle='--', label='Anomaly Scores')
-        
+        axes[i].plot(entity_scores,
+                     color='magenta',
+                     linestyle='--',
+                     label='Anomaly Scores')
+
         axes[i].set_title(f'Predictions of Model {model_name}', fontsize=16)
         axes[i].legend(fontsize=16, ncol=2, shadow=True, fancybox=True)
         axes[i].set_xlabel('Time', fontsize=16)
-        axes[i].set_ylabel('Y', fontsize=16)       
-    
+        axes[i].set_ylabel('Y', fontsize=16)
+
     if savefig:
         plt.savefig('predictions.pdf')
     plt.show()
 
-def visualize_data(train_data, test_data, savefig=False): 
+
+def visualize_data(train_data, test_data, savefig=False):
     """Visualizes train and testing splits of a univariate entity.
     """
     # Visualize the train and the test data
@@ -81,15 +103,20 @@ def visualize_data(train_data, test_data, savefig=False):
     start_anomaly = np.argmax(np.diff(test_data.entities[0].labels.flatten()))
     end_anomaly = np.argmin(np.diff(test_data.entities[0].labels.flatten()))
 
-    axes[1].plot(test_data.entities[0].Y.flatten(), color='darkblue', label='Y')
-    axes[1].plot(np.arange(start_anomaly, end_anomaly), test_data.entities[0].Y.flatten()[start_anomaly:end_anomaly], color='red', label='Anomaly')
+    axes[1].plot(test_data.entities[0].Y.flatten(),
+                 color='darkblue',
+                 label='Y')
+    axes[1].plot(np.arange(start_anomaly, end_anomaly),
+                 test_data.entities[0].Y.flatten()[start_anomaly:end_anomaly],
+                 color='red',
+                 label='Anomaly')
     axes[1].set_title('Test data', fontsize=16)
     axes[1].legend(fontsize=16, ncol=2, shadow=True, fancybox=True)
-    
+
     if savefig:
         plt.savefig('data_visual.pdf')
     plt.show()
-    
+
 
 def de_unfold(windows, window_step):
     """Stiches multiple windows together.
@@ -102,20 +129,21 @@ def de_unfold(windows, window_step):
 
     assert window_step <= window_size, 'Window step must be smaller than window_size'
 
-    total_len = (n_windows)*window_step + (window_size-window_step)
+    total_len = (n_windows) * window_step + (window_size - window_step)
 
     x = np.zeros((n_channels, total_len))
     counter = np.zeros((1, total_len))
 
     for i in range(n_windows):
-        start = i*window_step
+        start = i * window_step
         end = start + window_size
         x[:, start:end] += windows[i]
         counter[:, start:end] += 1
 
-    x = x/counter
+    x = x / counter
 
     return x
+
 
 class Logger(object):
     def __init__(self,
@@ -139,40 +167,55 @@ class Logger(object):
         self._VALID_FILE_TYPES = ['auto', 'data', 'torch', 'csv']
 
     def make_directories(self):
-        if self.obj_class is not None: 
-            if not os.path.exists(self.obj_save_path): 
+        if self.obj_class is not None:
+            if not os.path.exists(self.obj_save_path):
                 os.makedirs(self.obj_save_path, exist_ok=True)
 
-    def check_file_exists(self, obj_class:Union[str, List[str]], obj_name:str):
-        obj_save_path=self.get_obj_save_path(obj_class)
-        return os.path.exists(os.path.join(obj_save_path, str(obj_name) + '.pth')) or os.path.exists(os.path.join(obj_save_path, str(obj_name) + '.data')) or os.path.exists(os.path.join(obj_save_path, str(obj_name) + '.csv'))
-    
+    def check_file_exists(self, obj_class: Union[str, List[str]],
+                          obj_name: str):
+        obj_save_path = self.get_obj_save_path(obj_class)
+        return os.path.exists(
+            os.path.join(obj_save_path,
+                         str(obj_name) + '.pth')) or os.path.exists(
+                             os.path.join(
+                                 obj_save_path,
+                                 str(obj_name) + '.data')) or os.path.exists(
+                                     os.path.join(obj_save_path,
+                                                  str(obj_name) + '.csv'))
+
     def save_torch_model(self):
-        with open(os.path.join(self.obj_save_path, str(self.obj_name) + '.pth'), 'wb') as f:
+        with open(
+                os.path.join(self.obj_save_path,
+                             str(self.obj_name) + '.pth'), 'wb') as f:
             # t.save(self.obj.state_dict(), f) # TODO: We will not support saving state dicts for now
             t.save(self.obj, f)
 
     def save_data_object(self):
-        with open(os.path.join(self.obj_save_path, str(self.obj_name) + '.data'), 'wb') as f:
+        with open(
+                os.path.join(self.obj_save_path,
+                             str(self.obj_name) + '.data'), 'wb') as f:
             pkl.dump(self.obj, f)
 
     def save_csv(self):
-        self.obj.to_csv(os.path.join(self.obj_save_path, str(self.obj_name) + '.csv'), index=None)
-        
+        self.obj.to_csv(os.path.join(self.obj_save_path,
+                                     str(self.obj_name) + '.csv'),
+                        index=None)
+
     def save_meta_object(self):
-        with open(os.path.join(self.obj_save_path, str(self.obj_name) + '.meta'), 'wb') as f:
+        with open(
+                os.path.join(self.obj_save_path,
+                             str(self.obj_name) + '.meta'), 'wb') as f:
             pkl.dump(self.obj_meta, f)
 
     def get_obj_save_path(self, obj_class):
         return os.path.join(self.save_dir, '/'.join(obj_class))
-    
-    def save(self, 
-                obj:Union[t.nn.Module, np.ndarray, List, Dict],
-                obj_name:str,
-                obj_meta:Optional[Union[str, List[str]]], 
-                obj_class:Optional[Union[str, List[str]]],
-                type:str='auto'
-                ):
+
+    def save(self,
+             obj: Union[t.nn.Module, np.ndarray, List, Dict],
+             obj_name: str,
+             obj_meta: Optional[Union[str, List[str]]],
+             obj_class: Optional[Union[str, List[str]]],
+             type: str = 'auto'):
         """
         Parameters
         ----------
@@ -191,49 +234,57 @@ class Logger(object):
         self.obj_class = obj_class
         self.obj_name = obj_name
         self.obj_meta = obj_meta
-    
-        self.obj_save_path = self.get_obj_save_path(obj_class)
-        self.make_directories() # Make all necessary directories to save the object
 
-        if not self.overwrite: 
-            if self.check_file_exists(obj_class=obj_class, obj_name=obj_name): # Check if the file already exists!
-                print(f'File already exists! Overwriting is set to {self.overwrite}')
-                return 
-        
-        if type == 'auto': 
+        self.obj_save_path = self.get_obj_save_path(obj_class)
+        self.make_directories(
+        )  # Make all necessary directories to save the object
+
+        if not self.overwrite:
+            if self.check_file_exists(
+                    obj_class=obj_class,
+                    obj_name=obj_name):  # Check if the file already exists!
+                print(
+                    f'File already exists! Overwriting is set to {self.overwrite}'
+                )
+                return
+
+        if type == 'auto':
             if isinstance(obj, t.nn.Module):
                 self.save_torch_model()
             elif isinstance(obj, pd.DataFrame):
                 self.save_csv()
             else:
                 self.save_data_object()
-        elif type == 'torch': 
+        elif type == 'torch':
             self.save_torch_model()
         elif type == 'data':
             self.save_data_object()
         elif type == 'csv':
             self.save_csv()
 
-        if self.obj_meta is not None: 
+        if self.obj_meta is not None:
             self.save_meta_object()
-        
-        if self.verbose: 
-            print(f'Saving file {os.path.join(self.obj_save_path, str(self.obj_name))}')
+
+        if self.verbose:
+            print(
+                f'Saving file {os.path.join(self.obj_save_path, str(self.obj_name))}'
+            )
+
 
 # def load_metrics(PATH):
 #     with open(PATH, 'rb') as f:
 #         return pkl.load(f)
-    
+
 # def get_unsupervsed_performance_metrics(entity_name: Union[str, List[str]], model_name: Union[str, List[str]]):
 #     """
 #     """
 #     PATH_TO_METRICS = r'/home/ubuntu/TSADModelSelection/observed_metrics/collected_metrics/metrics_dictionary.data'
 #     metrics_dict=  load_metrics(PATH_TO_METRICS)
-    
+
 #     if entity_name == 'all': entity_name = ENTITIES
 #     if model_name == 'all': model_name = MODEL_ARCHITECTURES
 
-#     if isinstance(entity_name, str) and isinstance(model_name, str): 
+#     if isinstance(entity_name, str) and isinstance(model_name, str):
 #         return metrics_dict[f'{model_name}_{entity_name}']
 #     else:
 #         metrics_dict_all = []
@@ -246,30 +297,30 @@ class Logger(object):
 #                 metrics_dict_all.append(metrics_dict[model_entity_pair])
 #         return np.concatenate(metrics_dict_all, axis=0)
 
-# def aggregate_ranking_result(preference_matrix: np.ndarray, invert: bool=True):    
-#     """Computes aggregate model ranking from preferences based on multiple metrics. 
+# def aggregate_ranking_result(preference_matrix: np.ndarray, invert: bool=True):
+#     """Computes aggregate model ranking from preferences based on multiple metrics.
 
 #     Parameters
 #     ----------
 #     preference_matrix: np.ndarray
-#         Matrix of preferences. Rows are models while columns are metrics. 
-#     invert: bool 
+#         Matrix of preferences. Rows are models while columns are metrics.
+#     invert: bool
 #         Invert metrics. This is such that preferences have positive correlation with
-#         the intended model ranking. 
-    
+#         the intended model ranking.
+
 #     Returns
 #     ----------
 #     pred_model_perf_scores: np.ndarray
 #         Predicted model performance score. A higher score means that the model is expected to be better
-#         in predicting the test performance. 
+#         in predicting the test performance.
 #     """
-    
+
 #     ## Transforming preference matrix to have positive correlation
 #     if invert:
 #         preference_matrix = pd.DataFrame(1/(preference_matrix + 1)).dropna(axis='columns')
-#     else: 
+#     else:
 #         preference_matrix = pd.DataFrame(preference_matrix).dropna(axis='columns')
-    
+
 #     pred_model_perf_scores = ranking.kemeny_young(m=preference_matrix, axis=1)
 
 #     return pred_model_perf_scores.to_numpy()
