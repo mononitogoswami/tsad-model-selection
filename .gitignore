@@ -1,4 +1,6 @@
 # Ignore folders
+src/dev_scripts/
+src/deprecated/
 
 # Repository specific stuff
 .txt
