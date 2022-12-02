@@ -9,15 +9,15 @@
 ######################################################
 
 import os
-import sys
 
+import sys
 sys.path.append('../')  # TODO: Make this relative path maybe
 from model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 
 DATASETS = ['anomaly_archive', 'smd']
 ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
-# TRAINED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/trained_models/'
-TRAINED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/trained_models_wo_downsampling/'
+TRAINED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/trained_models/'
+# TRAINED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/trained_models_wo_downsampling/'
 
 
 def main():

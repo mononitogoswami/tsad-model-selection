@@ -15,19 +15,26 @@ sys.path.append('../')  # TODO: Make this relative path maybe
 from model_trainer.trainer import TrainModels
 from model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 from joblib import Parallel, delayed
+import numpy as ndp
+
+# To reduce randomness
+import torch 
 import numpy as np
+SEED = 13
+torch.manual_seed(SEED)
+np.random.seed(SEED)
 
 # DATASETS = ['anomaly_archive', 'smd']
 # ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
-DATASETS = ['anomaly_archive']
-ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[180:]]
-# DATASETS = ['smd']
-# ENTITIES = [MACHINES]
+# DATASETS = ['anomaly_archive']
+# ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[:10]]
+DATASETS = ['smd']
+ENTITIES = [MACHINES[:7]]
 
 N_JOBS = 2
-DOWNSAMPLING = None  # 10
+DOWNSAMPLING = 10  # None
 # Directory to save the trained models
-TRAINED_MODEL_PATH = '/home/scratch/mgoswami/trained_models_wo_downsampling'  # '/home/scratch/mgoswami/trained_models_wo_downsampling'
+TRAINED_MODEL_PATH = '/home/scratch/mgoswami/trained_models'  # '/home/scratch/mgoswami/trained_models_wo_downsampling'
 DATASET_PATH = '/home/scratch/mgoswami/datasets/'
 
 

@@ -1,5 +1,4 @@
 import numpy as np
-import itertools as it
 import distributions.mallows_kendall as mk
 import distributions.mallows_hamming as mh
 

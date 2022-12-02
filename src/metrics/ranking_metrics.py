@@ -4,20 +4,24 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# import sys
-# sys.path.append('/home/ubuntu/TSADModelSelection')
-# sys.path.append('/home/ubuntu/PyMAD/')
-
-from typing import Tuple, Union, Callable, List
+from typing import Union, Callable, List
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
-from scipy.stats import spearmanr, kendalltau
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
 from distributions.mallows_kendall import distance as kendalltau_dist
-from metrics.metrics import mse, mae, smape, mape, prauc, gaussian_likelihood, ndcg, kendalltau_topk
-import pandas as pd
+from metrics.metrics import mse, mae, smape, mape, prauc, gaussian_likelihood
 
-from src.pymad.evaluation.numpy import best_f1_linspace, adjusted_precision_recall_f1_auc
+import sys
+sys.path.append('/zfsauton2/home/mgoswami/PyMAD/src/')
+sys.path.append('/zfsauton2/home/mgoswami/tsad-model-selection/VUS/')
+from pymad.evaluation.numpy import best_f1_linspace, adjusted_precision_recall_f1_auc
+
+from vus.models.feature import Window
+from vus.metrics import get_range_vus_roc
+from vus.utils.slidingWindows import find_length
+
 
 ######################################################
 # Functions to compute ranks of models given their predictions
@@ -64,8 +68,8 @@ def rank_by_centrality(predictions: dict,
     return pd.DataFrame(CENTRALITY)
 
 
-def rank_by_prauc_f1(predictions: dict, n_splits=100) -> pd.DataFrame:
-    """Rank models based on their observed (adjusted) PR-AUCs and Best F-1. 
+def rank_by_metrics(predictions: dict, n_splits=100, sliding_window=None) -> pd.DataFrame:
+    """Rank models based on their observed (adjusted) PR-AUCs, Best F-1 and VUS. 
     
     Parameters
     ----------
@@ -76,12 +80,21 @@ def rank_by_prauc_f1(predictions: dict, n_splits=100) -> pd.DataFrame:
     METRICS = {}
     METRICS['PR-AUC'] = {}
     METRICS['Best F-1'] = {}
+    METRICS['VUS'] = {}
     for model_name in MODEL_NAMES:
-        _, _, f1, auc, *_ = adjusted_precision_recall_f1_auc(
-            predictions[model_name]['anomaly_labels'].squeeze(),
-            predictions[model_name]['entity_scores'].squeeze(), n_splits)
+        labels = predictions[model_name]['anomaly_labels'].squeeze()
+        scores = predictions[model_name]['entity_scores'].squeeze()
+        _, _, f1, auc, *_ = adjusted_precision_recall_f1_auc(labels, scores, n_splits)
+        
+        if sliding_window is None: 
+            sliding_window = find_length(predictions[model_name]['Y'].flatten()) 
+
+        scores = MinMaxScaler(feature_range=(0,1)).fit_transform(scores.reshape(-1,1)).ravel()
+        evaluation_scores = get_range_vus_roc(scores, labels, sliding_window)
+       
         METRICS['PR-AUC'][model_name] = auc
         METRICS['Best F-1'][model_name] = f1
+        METRICS['VUS'][model_name] = evaluation_scores['VUS_ROC']
 
     return pd.DataFrame(METRICS)
 
@@ -129,6 +142,42 @@ def rank_by_max_F1(predictions: dict, n_splits=100) -> pd.DataFrame:
 
     return pd.DataFrame(F1)
 
+def rank_by_vus(predictions: dict, sliding_window: int=None) -> pd.DataFrame:
+    """Rank models based on their volume under the ROC surface metric
+
+    A recent study [1] claimed that VUS-ROC is the best metrtic in terms of separability, 
+    consistency and robustness.
+
+    NOTE: VUS-ROC for multivariate timeseries is untested. 
+    
+    Parameters
+    ----------
+    predictions: dict
+        Predictions dictionary returned by the `evaluate_models(...)` function.
+    sliding_window: int
+        Sliding window parameter for the VUS metric
+    
+    References
+    ----------
+    [1] Volume Under the Surface: A New Accuracy Evaluation Measure for Time-Series 
+        Anomaly Detection
+    """
+    MODEL_NAMES = list(predictions.keys())
+    if sliding_window is None: 
+        sliding_window = find_length(predictions[MODEL_NAMES[0]]['Y'].flatten()) 
+
+    VUS = {}
+    VUS['VUS'] = {}
+    for model_name in MODEL_NAMES:
+        scores = predictions[model_name]['entity_scores'].squeeze()
+        labels = predictions[model_name]['anomaly_labels'].squeeze()
+        scores = MinMaxScaler(feature_range=(0,1)).fit_transform(scores.reshape(-1,1)).ravel()
+        evaluation_scores = get_range_vus_roc(scores, labels, sliding_window)
+        
+        VUS['VUS'][model_name] = evaluation_scores['VUS_ROC']
+
+    return pd.DataFrame(VUS)
+
 
 def rank_by_forecasting_metrics(predictions: dict) -> pd.DataFrame:
     """Rank models based on their forecasting performance. 
@@ -172,36 +221,35 @@ def rank_by_forecasting_metrics(predictions: dict) -> pd.DataFrame:
 
 
 def rank_by_synthetic_anomlies(predictions,
-                               criterion='f1',
-                               n_splits=100) -> pd.DataFrame:
+                               n_splits=100, 
+                               sliding_window=None) -> pd.DataFrame:
     MODEL_NAMES = list(predictions.keys())
     ANOMALY_TYPES = list(
         set([i.split('_')[2] for i in predictions[MODEL_NAMES[0]].keys()]))
 
-    SYNTHETIC_KENDAL_TAU = {}
+    evaluation_scores = {}
 
     for model_name in MODEL_NAMES:
-        skt = {}
+        es = {}
         for anomaly_type in ANOMALY_TYPES:
-            anomaly_scores = predictions[model_name][
-                f'anomalysizes_type_{anomaly_type}']
-            anomaly_labels = predictions[model_name][
-                f'anomalylabels_type_{anomaly_type}']
-            entity_scores = predictions[model_name][
-                f'entityscores_type_{anomaly_type}']
-            if criterion == 'kendall':
-                skt[f'SYNTHETIC_{criterion.upper()}_{anomaly_type}_{id}'] = \
-                    kendalltau_topk(anomaly_scores.flatten(),
-                                    entity_scores.flatten(),
-                                    np.sum(anomaly_scores > 0.05))[0]
-            elif criterion in ['prauc', 'f1']:
-                _, _, f1, auc, *_ = adjusted_precision_recall_f1_auc(
-                    anomaly_labels.flatten(), entity_scores.flatten(),
-                    n_splits)
+            labels = predictions[model_name][
+                f'anomalylabels_type_{anomaly_type}'].flatten()
+            scores = predictions[model_name][
+                f'entityscores_type_{anomaly_type}'].flatten()
+            
+            _, _, f1, auc, *_ = adjusted_precision_recall_f1_auc(labels, scores, n_splits)
 
-                skt[f'SYNTHETIC_F1_{anomaly_type}'] = f1
-                skt[f'SYNTHETIC_PR-AUC_{anomaly_type}'] = auc
+            if sliding_window is None: 
+                T_a = predictions[model_name][f'Ta_type_{anomaly_type}'].flatten()
+                sliding_window = find_length(T_a) 
 
-        SYNTHETIC_KENDAL_TAU[model_name] = skt
+            scores = MinMaxScaler(feature_range=(0,1)).fit_transform(scores.reshape(-1,1)).ravel()
+            vus_scores = get_range_vus_roc(scores, labels, sliding_window)
+            
+            es[f'SYNTHETIC_F1_{anomaly_type}'] = f1
+            es[f'SYNTHETIC_PR-AUC_{anomaly_type}'] = auc
+            es[f'SYNTHETIC_VUS_{anomaly_type}'] = vus_scores['VUS_ROC']
 
-    return pd.DataFrame(SYNTHETIC_KENDAL_TAU).T.dropna(axis=1)
+        evaluation_scores[model_name] = es
+
+    return pd.DataFrame(evaluation_scores).T.dropna(axis=1)

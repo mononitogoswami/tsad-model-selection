@@ -11,30 +11,37 @@ import numpy as np
 import os
 import pickle
 import pandas as pd
-
 import sys
+from joblib import Parallel, delayed
 
-sys.path.append('../')  # TODO: Make this relative path maybe
+print('Loaded 1!')
+sys.path.append('/zfsauton2/home/mgoswami/tsad-model-selection/src/')
 
 from model_selection.model_selection import RankModels
 from model_selection.utils import Logger
-from model_selection.utils import visualize_predictions, visualize_data
-from model_selection.rank_aggregation import trimmed_borda, trimmed_kemeny, borda, kemeny
-from metrics.metrics import evaluate_model_selection
 from model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
-from joblib import Parallel, delayed
+
+print('Loaded 2!')
+
+# To reduce randomness
+import torch 
+import numpy as np
+SEED = 13
+torch.manual_seed(SEED)
+np.random.seed(SEED)
 
 # DATASETS = ['anomaly_archive', 'smd']
 # ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
-DATASETS = ['anomaly_archive']
-ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[70:90]]
-# DATASETS = ['smd']
+# DATASETS = ['anomaly_archive']
+# ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[:20]]
+DATASETS = ['smd']
 # ENTITIES = [MACHINES]
+ENTITIES = [['machine-1-1']]
 
 RESULTS_PATH = r'/home/scratch/mgoswami/results/'  # Directory to save the results
 TRAINED_MODEL_PATH = r'/home/scratch/mgoswami/trained_models/'
 DATASET_PATH = r'/home/scratch/mgoswami/datasets/'
-N_JOBS = 2  # Number of parallel jobs to run
+N_JOBS = 1  # Number of parallel jobs to run
 
 # Logging object
 VERBOSE = False
@@ -86,12 +93,12 @@ def evaluate_model_wrapper(dataset, entity):
     # Create a ranking object
     ranking_obj = RankModels(**rank_model_params)
 
-    try:
-        _ = ranking_obj.evaluate_models(**evaluate_model_params)
+    # try:
+    _ = ranking_obj.evaluate_models(**evaluate_model_params)
         # _ = ranking_obj.rank_models()
-    except:
-        unevaluated_entities.append((dataset, entity))
-        return
+    # except:
+        # unevaluated_entities.append((dataset, entity))
+        # return
 
     # Save the ranking objection for later use
     logging_obj.save(obj=ranking_obj,

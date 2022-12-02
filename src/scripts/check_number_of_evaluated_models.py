@@ -16,7 +16,7 @@ from model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 
 DATASETS = ['anomaly_archive', 'smd']
 ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
-EVALUATED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/results/'
+EVALUATED_MODEL_BASE_PATH = r'/home/scratch/mgoswami/Experiments_Oct29/results/'
 
 total_models = 0
 for d, dataset in enumerate(DATASETS):

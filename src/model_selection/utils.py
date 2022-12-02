@@ -14,7 +14,6 @@ import torch as t
 import os
 import matplotlib.pyplot as plt
 
-
 def visualize_predictions(predictions: dict, savefig=True):
     """Visualizes univariate models given the predictions dictionary
     """

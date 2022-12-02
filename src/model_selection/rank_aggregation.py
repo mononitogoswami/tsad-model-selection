@@ -14,11 +14,12 @@ from typing import Optional, Tuple
 from sklearn.preprocessing import MinMaxScaler
 import cvxpy as cp
 from itertools import combinations, permutations
-import distributions.mallows_kendall as mk
 from sklearn.neighbors import NearestNeighbors
 import networkx as nx
 from scipy.spatial.distance import pdist, squareform
 from sklearn.cluster import AgglomerativeClustering
+
+import distributions.mallows_kendall as mk
 
 ##########################################
 # Trimmed Rank Aggregators

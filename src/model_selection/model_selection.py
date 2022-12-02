@@ -11,11 +11,12 @@ from tqdm import tqdm
 import numpy as np
 import torch as t
 
-from src.pymad.datasets.load import load_data
-from model_selection.model_selection_utils import evaluate_model, evaluate_model_synthetic_anomalies, get_eval_batchsizes, rank_models
-from metrics.ranking_metrics import rank_by_praucs, rank_by_centrality, rank_by_synthetic_anomlies, rank_by_forecasting_metrics, rank_by_max_F1, rank_by_prauc_f1
-# from model_selection.utils import visualize_predictions, visualize_data
+import sys
+sys.path.append('/zfsauton2/home/mgoswami/PyMAD/src/')
+from pymad.datasets.load import load_data
 
+from model_selection.model_selection_utils import evaluate_model, evaluate_model_synthetic_anomalies, get_eval_batchsizes, rank_models
+from metrics.ranking_metrics import rank_by_centrality, rank_by_synthetic_anomlies, rank_by_forecasting_metrics, rank_by_metrics
 
 class RankModels(object):
     # NOTE: trained_model_path, downsampling, min_length, root_dir and normalize
@@ -94,7 +95,8 @@ class RankModels(object):
                         n_repeats: int = 3,
                         split: str = 'test',
                         synthetic_ranking_criterion: str = 'prauc',
-                        n_splits: int = 100) -> pd.DataFrame:
+                        n_splits: int = 100,
+                        sliding_window: int = None) -> pd.DataFrame:
         self.n_repeats = n_repeats
 
         self.predictions = {}
@@ -134,8 +136,9 @@ class RankModels(object):
         # Now use to predictions to rank the model
         # self.models_prauc = rank_by_praucs(self.predictions)
         # self.models_f1 = rank_by_max_F1(self.predictions, n_splits=n_splits)
-        self.models_prauc_f1 = rank_by_prauc_f1(self.predictions,
-                                                n_splits=n_splits)
+        # self.models_prauc_f1 = rank_by_prauc_f1(self.predictions, n_splits=n_splits)
+        
+        self.models_evaluation_metrics = rank_by_metrics(self.predictions,n_splits=n_splits, sliding_window=sliding_window)
         self.models_forecasting_metrics = rank_by_forecasting_metrics(
             self.predictions)
         self.models_centrality = rank_by_centrality(self.predictions,
@@ -146,7 +149,7 @@ class RankModels(object):
             n_splits=n_splits)
 
         self.models_performance_matrix = pd.concat([
-            self.models_prauc_f1, self.models_forecasting_metrics,
+            self.models_evaluation_metrics, self.models_forecasting_metrics,
             self.models_centrality, self.models_synthetic_anomlies
         ],
                                                    axis=1)

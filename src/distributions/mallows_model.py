@@ -1,7 +1,4 @@
 import numpy as np
-import distributions.mallows_kendall as mk
-import distributions.mallows_hamming as mh
-
 
 def check_theta_phi(theta, phi):
     """This function automatically converts theta to phi or phi to theta as

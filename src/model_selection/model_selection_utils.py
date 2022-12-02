@@ -10,14 +10,17 @@ import torch as t
 from tqdm import tqdm, trange
 from copy import deepcopy
 import pandas as pd
+from sklearn.model_selection import ParameterGrid
 
-from src.pymad.loaders.loader import Loader
-from src.pymad.datasets.dataset import Dataset, Entity
-from src.pymad.models.base_model import PyMADModel
+import sys
+sys.path.append('/zfsauton2/home/mgoswami/PyMAD/src/')
+from pymad.loaders.loader import Loader
+from pymad.datasets.dataset import Dataset, Entity
+from pymad.models.base_model import PyMADModel
 
 from model_selection.inject_anomalies import InjectAnomalies
 from model_selection.utils import de_unfold
-from sklearn.model_selection import ParameterGrid
+
 
 ######################################################
 # Functions to predict Y_hat given a model
@@ -379,7 +382,7 @@ def rank_models(
     # If the value is lower for a model, the model is better
     LOWER_BETTER = ['MAE', 'MSE', 'SMAPE', 'MAPE', 'CENTRALITY']
     # If the value is higher for a model, the model is better
-    HIGHER_BETTER = ['LIKELIHOOD', 'SYNTHETIC', 'PR-AUC', 'Best F-1']
+    HIGHER_BETTER = ['LIKELIHOOD', 'SYNTHETIC', 'PR-AUC', 'Best F-1', 'VUS']
 
     METRIC_NAMES = [i.split('_')[0] for i in models_performance_matrix.columns]
     SORT_DIRECTION = []
@@ -400,9 +403,10 @@ def rank_models(
 
     rank_prauc = ranks[0, :]  # Rank based on PR-AUC
     rank_f1 = ranks[1, :]  # Rank based on F-1
-    ranks_by_metrics = ranks[2:, ]  # Ranks includes
+    rank_vus = ranks[2, :]  # Rank based on VUS
+    ranks_by_metrics = ranks[3:, ]  # Ranks 
 
-    return ranks_by_metrics, rank_prauc, rank_f1
+    return ranks_by_metrics, rank_prauc, rank_f1, rank_vus
 
 
 def get_eval_batchsizes(model_name: str) -> int:

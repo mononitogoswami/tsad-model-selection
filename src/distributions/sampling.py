@@ -5,7 +5,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from typing import Optional, Tuple
+from typing import Optional
+
 import distributions.mallows_kendall as mk
 from distributions.pl_model import PlackettLuce
 

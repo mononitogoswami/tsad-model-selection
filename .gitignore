@@ -1,3 +1,5 @@
+.DS_Store
+
 # Ignore folders
 src/dev_scripts/
 src/deprecated/

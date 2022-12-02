@@ -1,5 +1,4 @@
 import numpy as np
-import itertools as it
 from scipy.optimize import linear_sum_assignment
 import distributions.mallows_model as mm
 

@@ -10,38 +10,24 @@ import pickle as pkl
 import numpy as np
 import matplotlib.pyplot as plt
 
-from datetime import datetime
+import sys
+sys.path.append('../')  # TODO: Make this relative path maybe
 from evaluation.evaluation import get_pooled_aggregate_stats
 from sklearn.model_selection import ParameterGrid
 
-SAVE_DIR = r'/home/scratch/mgoswami/results/'  # Directory to save all the results
+# To reduce randomness
+import torch 
+import numpy as np
+SEED = 13
+torch.manual_seed(SEED)
+np.random.seed(SEED)
+
+RANKING_OBJECTS_DIR = r'/home/scratch/mgoswami/Experiments_Oct29/results/'  # Directory where all ranking objects are saved
+SAVE_DIR = r'/home/scratch/mgoswami/Experiments_F1'
+
 evaluation_params = [
     {
-        'save_dir': [SAVE_DIR],
-        'dataset': ['anomaly_archive'],
-        'data_family': [
-            'NASA Data',
-            'Gait',
-            'Respiration Rate (RESP)',
-            'Acceleration Sensor Data',
-            'Air Temperature',
-            'Atrial Blood Pressure (ABP)',
-            'Electrocardiogram (ECG) Arrhythmia',
-            'Insect Electrical Penetration Graph (EPG)',
-            'Power Demand',
-        ],
-        'evaluation_metric': ['Best F-1'],
-        'n_validation_splits': [5],
-        'n_neighbors': [[2, 4, 6]],
-        'random_state': [13],
-        'n_splits': [100],
-        'metric': ['influence'],
-        'top_k': [3],
-        'top_kr': [None],
-        'n_jobs': [3]
-    },
-    {
-        'save_dir': [SAVE_DIR],
+        'save_dir': [RANKING_OBJECTS_DIR],
         'dataset': ['smd'],
         'data_family': ['SMD'],
         'evaluation_metric': ['Best F-1'],
@@ -49,10 +35,38 @@ evaluation_params = [
         'n_neighbors': [[2, 4, 6]],
         'random_state': [13],
         'n_splits': [100],
+        'sliding_window': [None],
         'metric': ['influence'],
+        'use_all_ranks': [False],
         'top_k': [3],
         'top_kr': [None],
-        'n_jobs': [3]
+        'n_jobs': [5]
+    },
+    {
+        'save_dir': [RANKING_OBJECTS_DIR],
+        'dataset': ['anomaly_archive'],
+        'data_family': [
+            'Atrial Blood Pressure (ABP)',
+            'Electrocardiogram (ECG) Arrhythmia',
+            'Insect Electrical Penetration Graph (EPG)',
+            'Power Demand',
+            'NASA Data',
+            'Gait',
+            'Respiration Rate (RESP)',
+            'Acceleration Sensor Data',
+            'Air Temperature',
+        ],
+        'evaluation_metric': ['Best F-1'],
+        'n_validation_splits': [5],
+        'n_neighbors': [[2, 4, 6]],
+        'random_state': [13],
+        'n_splits': [100],
+        'sliding_window': [None],
+        'metric': ['influence'],
+        'top_k': [3],
+        'use_all_ranks': [False],
+        'top_kr': [None],
+        'n_jobs': [5]
     },
 ]
 
@@ -65,5 +79,5 @@ for params in list(ParameterGrid(evaluation_params)):
     else:
         aggregate_stats['smd'] = stats
 
-    with open(f"aggregate_stats_{params['dataset']}.pkl", 'wb') as f:
+    with open(os.path.join(SAVE_DIR, f"aggregate_stats_{params['dataset']}.pkl"), 'wb') as f:
         pkl.dump(aggregate_stats, f)

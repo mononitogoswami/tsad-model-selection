@@ -1,6 +1,6 @@
 import numpy as np
-import itertools as it
 import scipy.optimize as sp_opt
+
 import distributions.mallows_model as mm
 import distributions.permutil as pu
 

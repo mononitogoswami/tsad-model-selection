@@ -12,9 +12,10 @@ import numpy as np
 from typing import Optional, List, Union
 from sklearn.metrics import ndcg_score, precision_recall_curve, auc, average_precision_score
 from scipy.stats import spearmanr, kendalltau, norm
-# import sys
-# sys.path.append('/home/ubuntu/PyMAD/')
-from src.pymad.evaluation.numpy import adjusted_precision_recall_f1_auc
+
+import sys
+sys.path.append('/zfsauton2/home/mgoswami/PyMAD/src/')
+from pymad.evaluation.numpy import adjusted_precision_recall_f1_auc
 
 
 def kendalltau_topk(a: np.array, b: np.array, k: int = 60):
