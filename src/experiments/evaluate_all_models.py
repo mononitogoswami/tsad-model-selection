@@ -45,6 +45,7 @@ def set_eval_params(args):
 
 def evaluate_model_wrapper(dataset, entity, args):
     unevaluated_entities = []  # List of entities which remain unevaluated
+    evaluate_model_params, logging_obj, rank_model_params = set_eval_params(args)
 
     print(42 * "=")
     print(f"Evaluating models on entity: {entity}")
@@ -83,7 +84,7 @@ def main():
     parser.add_argument('--config_file_path',
                         '-c', 
                         type=str, 
-                        default='config.yaml',
+                        default='../../config.yaml',
                         help='path to config file')
     args = parser.parse_args()
     args = Config(config_file_path=args.config_file_path).parse()
@@ -94,11 +95,9 @@ def main():
     DATASETS = ['anomaly_archive', 'smd']
     ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
 
-    evaluate_model_params, logging_obj, rank_model_params = set_eval_params(args)
-
     for d_i, dataset in enumerate(DATASETS):
         _ = Parallel(n_jobs=args['n_jobs'])(
-            delayed(evaluate_model_wrapper)(dataset, entities)
+            delayed(evaluate_model_wrapper)(dataset, entities, args)
             for entities in ENTITIES[d_i])
 
 if __name__ == '__main__':
