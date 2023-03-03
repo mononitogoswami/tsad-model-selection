@@ -1,3 +1,7 @@
+# Pytorch models
+*.pt
+*.pth
+
 .DS_Store
 
 # Ignore folders
