@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-TL;DR: We introduce `tsadams` for unsupervised *t*ime-*s*eries *a*nomaly *d*etection *m*odel *s*election!
+TL;DR: We introduce `tsadams` for unsupervised <b>t</b>ime-<b>s</b>eries <b>a</b>nomaly <b>d</b>etection <b>m</b>odel <b>s</b>election!
 </p>
 
 Hundreds of models for anomaly detection in time-series are available to practitioners, but no method exists to select the best model and its hyperparameters for a given dataset when labels are not available. We construct three classes of surrogate metrics which we show to be correlated with common supervised anomaly detection accuracy metrics such as the F1 score. The three classes of metrics are prediction accuracy, centrality, and performance on injected synthetic anomalies. We show that some of the surrogate metrics are useful for unsupervised model selection but not sufficient by themselves. To this end, we treat metric combinations as a rank aggregation problem and propose a robust rank aggregation approach. Large scale experiments on multiple real-world datasets demonstrate that our proposed unsupervised aggregation approach is as effective as selecting the best model based on collecting anomaly labels.
