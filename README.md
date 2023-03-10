@@ -1,6 +1,15 @@
 <h1 align="center">Unsupervised Model Selection for Time-series Anomaly Detection</h1>
 <h3 align="center">Most time-series anomaly detection models don't need labels for training. So why should we need labels to select good models? </h3>
 
+<p align="center">
+    <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
+    <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=mononitogoswami/tsad-model-selection">
+</p>
+
+<p align="center">
+TL;DR: We introduce `tsadams` for unsupervised <b>t</b>ime-<b>s</b>eries <b>a</b>nomaly <b>d</b>etection <b>m</b>odel <b>s</b>election!
+</p>
+
 Hundreds of models for anomaly detection in time-series are available to practitioners, but no method exists to select the best model and its hyperparameters for a given dataset when labels are not available. We construct three classes of surrogate metrics which we show to be correlated with common supervised anomaly detection accuracy metrics such as the F1 score. The three classes of metrics are prediction accuracy, centrality, and performance on injected synthetic anomalies. We show that some of the surrogate metrics are useful for unsupervised model selection but not sufficient by themselves. To this end, we treat metric combinations as a rank aggregation problem and propose a robust rank aggregation approach. Large scale experiments on multiple real-world datasets demonstrate that our proposed unsupervised aggregation approach is as effective as selecting the best model based on collecting anomaly labels.
 
 <p align="center">

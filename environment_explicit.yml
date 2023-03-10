@@ -1,4 +1,4 @@
-name: modelselect
+name: tsadams
 channels:
   - conda-forge
   - defaults
