@@ -17,6 +17,8 @@ from ..datasets.dataset import Dataset, Entity
 from ..models.base_model import PyMADModel
 from ..model_selection.inject_anomalies import InjectAnomalies
 from .utils import de_unfold
+from ..model_trainer.hyperparameter_grids import RNN_TRAIN_PARAM_GRID, DGHL_TRAIN_PARAM_GRID, MD_TRAIN_PARAM_GRID, NN_TRAIN_PARAM_GRID, RM_TRAIN_PARAM_GRID, LSTMVAE_TRAIN_PARAM_GRID
+from ..model_selection.anomaly_parameters import ANOMALY_PARAM_GRID
 
 ######################################################
 # Functions to predict Y_hat given a model
@@ -238,8 +240,6 @@ def evaluate_model_synthetic_anomalies(data: Union[Dataset, Entity],
         The prediction dictionary comprises of entity_scores, Y (anomalous Y) and 
         anomalous scores returned by the anomaly injection algorithm. 
     """
-    from model_selection.anomaly_parameters import ANOMALY_PARAM_GRID
-
     ANOMALY_TYPES = list(ANOMALY_PARAM_GRID.keys())
 
     original_data = deepcopy(data)
@@ -408,8 +408,6 @@ def rank_models(
 def get_eval_batchsizes(model_name: str) -> int:
     """Return evaluation batch sizes of models
     """
-    from model_trainer.hyperparameter_grids import RNN_TRAIN_PARAM_GRID, DGHL_TRAIN_PARAM_GRID, MD_TRAIN_PARAM_GRID, NN_TRAIN_PARAM_GRID, RM_TRAIN_PARAM_GRID, LSTMVAE_TRAIN_PARAM_GRID
-
     _VALID_MODEL_NAMES = ['RNN', 'DGHL', 'LSTMVAE', 'MD', 'RM',
                           'NN']  # TODO: Should be stored somewhere centrally
 

@@ -9,13 +9,10 @@
 #######################################
 
 import os
-import numpy as np
 import pickle as pkl
-import matplotlib.pyplot as plt
-from argparse import ArgumentParser
 from sklearn.model_selection import ParameterGrid
 
-from tsadams.utils.config import Config
+from tsadams.utils.utils import get_args_from_cmdline
 from tsadams.utils.set_all_seeds import set_all_seeds
 from tsadams.evaluation.evaluation import get_pooled_aggregate_stats
 
@@ -28,7 +25,7 @@ def set_eval_params(args):
             'evaluation_metric': [args['evaluation_metric']],
             'n_validation_splits': [args['n_validation_splits']],
             'n_neighbors': [args['n_neighbors']],
-            'random_state': [args['random_state']],
+            'random_state': [args['random_seed']],
             'n_splits': [args['n_splits']],
             'sliding_window': [args['sliding_window']],
             'metric': [args['metric']],
@@ -54,7 +51,7 @@ def set_eval_params(args):
             'evaluation_metric': [args['evaluation_metric']],
             'n_validation_splits': [args['n_validation_splits']],
             'n_neighbors': [args['n_neighbors']],
-            'random_state': [args['random_state']],
+            'random_state': [args['random_seed']],
             'n_splits': [args['n_splits']],
             'sliding_window': [args['sliding_window']],
             'metric': [args['metric']],
@@ -67,14 +64,7 @@ def set_eval_params(args):
     return evaluation_params
 
 def main():
-    parser = ArgumentParser(description='Config file')
-    parser.add_argument('--config_file_path',
-                        '-c', 
-                        type=str, 
-                        default='../../config.yaml',
-                        help='path to config file')
-    args = parser.parse_args()
-    args = Config(config_file_path=args.config_file_path).parse()
+    args = get_args_from_cmdline()
    
     set_all_seeds(args['random_seed']) # Reduce randomness
 

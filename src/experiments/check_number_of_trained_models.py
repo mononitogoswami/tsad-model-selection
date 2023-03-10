@@ -9,22 +9,14 @@
 ######################################################
 
 import os
-from argparse import ArgumentParser
-from tsadams.utils.config import Config
+from tsadams.utils.utils import get_args_from_cmdline
 from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 
 DATASETS = ['anomaly_archive', 'smd']
 ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
 
 def main():
-    parser = ArgumentParser(description='Config file')
-    parser.add_argument('--config_file_path',
-                        '-c', 
-                        type=str, 
-                        default='../../config.yaml',
-                        help='path to config file')
-    args = parser.parse_args()
-    args = Config(config_file_path=args.config_file_path).parse()
+    args = get_args_from_cmdline()
 
     total_models = 0
     for d, dataset in enumerate(DATASETS):

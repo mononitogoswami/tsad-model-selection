@@ -9,19 +9,17 @@
 #######################################
 
 from joblib import Parallel, delayed
-from argparse import ArgumentParser
 from tsadams.model_selection.model_selection import RankModels
 from tsadams.utils.logger import Logger
-from tsadams.utils.config import Config
+from tsadams.utils.utils import get_args_from_cmdline
 from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 from tsadams.utils.set_all_seeds import set_all_seeds
 
 def set_eval_params(args):
     # Logger object to save the models
-    logging_obj = Logger(save_dir=args['result_path'],
+    logging_obj = Logger(save_dir=args['results_path'],
                          overwrite=args['overwrite'],
                          verbose=args['verbose'])
-
 
     ### Parameters for our Ranking Model
     rank_model_params = {
@@ -65,12 +63,10 @@ def evaluate_model_wrapper(dataset, entity, args):
     # Create a ranking object
     ranking_obj = RankModels(**rank_model_params)
 
-    try:
+    try: 
         _ = ranking_obj.evaluate_models(**evaluate_model_params)
-        # _ = ranking_obj.rank_models()
     except:
-        unevaluated_entities.append((dataset, entity))
-        # return
+        print(f'Error in evaluating models on entity: {entity}')
 
     # Save the ranking objection for later use
     logging_obj.save(obj=ranking_obj,
@@ -80,20 +76,14 @@ def evaluate_model_wrapper(dataset, entity, args):
                      type='data')
 
 def main():
-    parser = ArgumentParser(description='Config file')
-    parser.add_argument('--config_file_path',
-                        '-c', 
-                        type=str, 
-                        default='../../config.yaml',
-                        help='path to config file')
-    args = parser.parse_args()
-    args = Config(config_file_path=args.config_file_path).parse()
-
+    args = get_args_from_cmdline()
     
     set_all_seeds(args['random_seed']) # Reduce randomness
     
-    DATASETS = ['anomaly_archive', 'smd']
-    ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
+    # DATASETS = ['smd', 'anomaly_archive']
+    # ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
+    DATASETS = ['anomaly_archive']
+    ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[::-1]]
 
     for d_i, dataset in enumerate(DATASETS):
         _ = Parallel(n_jobs=args['n_jobs'])(

@@ -41,7 +41,7 @@ class TrainModels(object):
     downsampling: int
 
     root_dir: str
-
+        Dataset directory
     batch_size: int 
         Batch size for evaluation
     training_size: float
@@ -55,19 +55,19 @@ class TrainModels(object):
     """
 
     def __init__(self,
-                 dataset: str = 'anomaly_archive',
-                 entity: str = '233_UCR_Anomaly_mit14157longtermecg',
-                 downsampling: Optional[int] = None,
-                 min_length: Optional[int] = None,
-                 root_dir: str = '../../datasets/',
-                 training_size=1,
-                 overwrite: bool = False,
-                 verbose: bool = True,
-                 save_dir: str = '../trained_models'):
+                 dataset:str='anomaly_archive',
+                 entity:str='233_UCR_Anomaly_mit14157longtermecg',
+                 downsampling:Optional[int]=None,
+                 min_length:Optional[int]=None,
+                 root_dir:str='../../datasets/',
+                 training_size:float=1,
+                 overwrite:bool = False,
+                 verbose:bool = True,
+                 save_dir:str='../trained_models'):
 
         if training_size > 1.0:
             raise ValueError('Training size must be <= 1.0')
-        self.verbose = verbose
+        self.verbose = verbose        
         self.train_data = load_data(dataset=dataset,
                                     group='train',
                                     entities=entity,

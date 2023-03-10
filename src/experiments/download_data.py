@@ -8,20 +8,11 @@
 # Script to download the Server Machine and Anomaly Archive datasets
 #######################################
 
-
-from argparse import ArgumentParser
 from tsadams.datasets.load import load_data
-from tsadams.utils.config import Config
+from tsadams.utils.utils import get_args_from_cmdline
 
 def main():
-    parser = ArgumentParser(description='Config file')
-    parser.add_argument('--config_file_path',
-                        '-c', 
-                        type=str, 
-                        default='../../config.yaml',
-                        help='path to config file')
-    args = parser.parse_args()
-    args = Config(config_file_path=args.config_file_path).parse()
+    args = get_args_from_cmdline()
 
     _ = load_data(dataset='smd',
               group='train',

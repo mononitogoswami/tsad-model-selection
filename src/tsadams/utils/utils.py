@@ -2,6 +2,25 @@ import numpy as np
 import torch as t
 from re import L
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
+from tsadams.utils.config import Config
+
+def get_args_from_cmdline():
+    """
+    Get arguments from command line. Useful for 
+    experiments.
+    """
+    parser = ArgumentParser(description='Config file')
+    parser.add_argument('--config_file_path',
+                        '-c', 
+                        type=str, 
+                        default='../../configs/config.yml',
+                        required=False,
+                        help='path to config file')
+    args = parser.parse_args()
+    args = Config(config_file_path=args.config_file_path).parse()
+    
+    return args
 
 def de_unfold(windows, window_step):
     """
