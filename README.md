@@ -2,6 +2,11 @@
 <h3 align="center">Most time-series anomaly detection models don't need labels for training. So why should we need labels to select good models? </h3>
 
 <p align="center">
+    <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
+    <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=mononitogoswami/tsad-model-selection">
+</p>
+
+<p align="center">
 TL;DR: We introduce `tsadams` for unsupervised *t*ime-*s*eries *a*nomaly *d*etection *m*odel *s*election!
 </p>
 
