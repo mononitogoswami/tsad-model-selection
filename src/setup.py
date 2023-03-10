@@ -13,6 +13,21 @@ setup(
     author="Mononito Goswami",
     author_email="mgoswami@andrew.cmu.edu",
     license="Apache v2.0",
+    url="https://github.com/mononitogoswami/tsad-model-selection",
     zip_safe=False,
-    packages=find_packages()
+    packages=find_packages(),
+    install_requires=[
+        "cvxopt==1.3.0",
+        "cvxpy==1.2.2",
+        "matplotlib==3.6.2",
+        "numpy==1.23.4",
+        "networkx==2.8.8",
+        "pandas==1.5.2",
+        "patool==1.12",
+        "scikit-learn==1.1.3",
+        "scipy==1.9.3",
+        "setuptools==65.5.0"
+        "statsmodels==0.13.5",
+        "tqdm==4.64.1"
+        ]
 )

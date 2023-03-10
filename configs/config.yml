@@ -28,6 +28,6 @@ sliding_window: !!null
 metric: 'influence'
 top_k: 3
 use_all_ranks: False
-top_kr: None
+top_kr: !!null
 
 

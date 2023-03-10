@@ -7,6 +7,7 @@
 # Ignore folders
 src/dev_scripts/
 src/deprecated/
+tests/
 
 # Repository specific stuff
 .txt
