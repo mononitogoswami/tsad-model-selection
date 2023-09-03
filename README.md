@@ -21,8 +21,7 @@ Figure 1: *The Model Selection Workflow.* We identify three classes of surrogate
 If you use this code, please consider citing our work: 
 > [Unsupervised Model Selection for Time-series Anomaly Detection](https://openreview.net/pdf?id=gOZ_pKANaPW)\
 Mononito Goswami, Cristian Ignacio Challu, Laurent Callot, Lenon Minorics, Andrey Kan\
-International Conference on Learning Representations (ICLR), 2023\
-arXiv:2210.01078v3
+International Conference on Learning Representations (ICLR), 2023
 
 ----
 
