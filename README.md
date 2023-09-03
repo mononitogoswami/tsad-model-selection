@@ -3,7 +3,7 @@
 
 <p align="center">
     <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
-    <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=mononitogoswami/tsad-model-selection">
+<!--     <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=mononitogoswami/tsad-model-selection"> -->
 </p>
 
 <p align="center">
