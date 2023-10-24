@@ -29,8 +29,8 @@ International Conference on Learning Representations (ICLR), 2023
 
 1. [Datasets](#datasets)
 2. [Installation](#installation)
-3. [Citation](#citation)
-
+3. [Reproduce Results](#reproduction)
+4. [Citation](#citation)
 
 <a id="datasets"></a>
 ## Datasets
@@ -97,6 +97,16 @@ For an editable installation of our code from source, run the following commands
     foo@bar:~$ pip install -e .
 
 ```
+----
+
+<a id="reproduction"></a>
+## Reproduce Results
+Results from the paper can be reproduced by running the following scripts in this particular order. All the scripts can be found in `src > scripts` 
+1. Run `download_data.py` to download the Server Machine datasets and the UCR Anomaly Detection archive.
+2. Train multiple anomaly detection models for each dataset using the `train_all_models.py`. You can track the progress of trained models using the `check_number_of_trained_models.py`. After this stage, for each dataset in SMD and the UCR anomaly archive, we should have trained anomaly detection models. Note that for some datasets, some models might not have concluded training due to errors.
+3. Next, get predictions (i.e. use each model to reconstruct time-series in each dataset) for all models and datasets using the `evaluate_all_models.py`. The progress for this step can be tracked using `check_number_of_evaluated_models.py`.
+4. In the paper, we pool the predictions of a particular model on multiple related datasets. This gives us a more robust measure of performance. To pool predictions of multiple models, run the     compute_pooled_results.py`. With this we should be all set to perform model selection!
+5. Perform model selection for each pooled datasets and evaluate it using the `results.ipynb` notebook.
 
 ----
 <a id="citation"></a>
