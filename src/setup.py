@@ -26,7 +26,7 @@ setup(
         "patool==1.12",
         "scikit-learn==1.1.3",
         "scipy==1.9.3",
-        "setuptools==65.5.0"
+        "setuptools==65.5.0",
         "statsmodels==0.13.5",
         "tqdm==4.64.1"
         ]
